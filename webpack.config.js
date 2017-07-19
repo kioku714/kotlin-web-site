@@ -1,21 +1,21 @@
 'use strict';
 
-var path = require('path');
-var fs = require('fs');
+const path = require('path');
+const fs = require('fs');
 
-var Webpack = require('webpack');
-var WebpackExtractTextPlugin = require('extract-text-webpack-plugin');
-var LiveReloadPlugin = require('webpack-livereload-plugin');
-var extend = require('extend');
-var autoprefixer = require('autoprefixer');
-var parseArgs = require('minimist');
+const Webpack = require('webpack');
+const WebpackExtractTextPlugin = require('extract-text-webpack-plugin');
+const LiveReloadPlugin = require('webpack-livereload-plugin');
+const extend = require('extend');
+const autoprefixer = require('autoprefixer');
+const parseArgs = require('minimist');
 
-var isProduction = process.env.NODE_ENV === 'production';
-var isServer = process.argv.toString().includes('webpack-dev-server');
-var CLIArgs = parseArgs(process.argv.slice(2));
-var webDemoURL = CLIArgs['webdemo-url'] || 'http://kotlin-web-demo-cloud.passive.aws.intellij.net';
+const isProduction = process.env.NODE_ENV === 'production';
+const isServer = process.argv.toString().includes('webpack-dev-server');
+const CLIArgs = parseArgs(process.argv.slice(2));
+const webDemoURL = CLIArgs['webdemo-url'] || 'http://kotlin-web-demo-cloud.passive.aws.intellij.net';
 
-var webpackConfig = {
+const webpackConfig = {
   entry: {
     'common': 'page/common.js',
     'index': 'page/index/index.js',
@@ -25,7 +25,12 @@ var webpackConfig = {
     'community': 'page/community/community.js',
     'styles': 'styles.scss',
     'pdf': 'page/pdf.js',
-    'api': 'page/api/api.js'
+    'api': 'page/api/api.js',
+    'embeddable-code': [
+      'kotlin-runcode/dist/runcode'.js,
+      'kotlin-runcode/dist/vendor.js',
+      'kotlin-runcode/dist/runcode.css'
+    ]
   },
   output: {
     path: path.join(__dirname, '_assets'),
@@ -33,7 +38,11 @@ var webpackConfig = {
     filename: '[name].js'
   },
   resolve: {
-    modulesDirectories: ['node_modules', './static/js', './static/css']
+    modules: [
+      'node_modules',
+      path.resolve(__dirname, './static/js'),
+      path.resolve(__dirname, './static/css')
+    ]
   },
 
   devtool: !isProduction ? 'sourcemap' : false,
@@ -54,22 +63,22 @@ var webpackConfig = {
       {
         test: /\.css$/,
         loader: WebpackExtractTextPlugin.extract([
-          'css',
-          'postcss'
+          'css-loader',
+          'postcss-loader'
         ].join('!'))
       },
       {
         test: /\.scss$/,
         loader: WebpackExtractTextPlugin.extract([
-          'css',
-          'postcss',
-          'resolve-url?keepQuery',
-          'sass?sourceMap'
+          'css-loader',
+          'postcss-loader',
+          'resolve-url-loader?keepQuery',
+          'sass-loader?sourceMap'
         ].join('!'))
       },
       {
         test: /\.(woff|ttf)$/,
-        loader: 'file?name=[path][name].[ext]'
+        loader: 'file-loader?name=[path][name].[ext]'
       },
       {
         test: /\.twig$/,
@@ -78,20 +87,25 @@ var webpackConfig = {
       {
         test: /\.svg/,
         loaders: [
-          'url',
-          'svg-fill'
+          'url-loader',
+          'svg-fill-loader'
         ]
       },
       {
         test: /\.(jpe?g|png|gif)$/,
-        loader: 'advanced-url?limit=10000&name=[path][name].[ext]'
+        loader: 'advanced-url-loader?limit=10000&name=[path][name].[ext]'
+      },
+      {
+        test: /\.*$/,
+        include: require.resolve('kotlin-runcode'),
+        loader: 'file-loader',
+        options: {
+          name: 'qwroujergi'
+        }
       }
     ]
   },
 
-  postcss: [
-    autoprefixer({browsers: ['last 2 versions']})
-  ],
 
   plugins: [
     new Webpack.optimize.CommonsChunkPlugin({
@@ -102,9 +116,7 @@ var webpackConfig = {
     new Webpack.ProvidePlugin({
       $: 'jquery',
       jQuery: 'jquery',
-      'window.jQuery': 'jquery',
-      fetch: 'imports?this=>global!exports?global.fetch!whatwg-fetch',
-      Promise: 'imports?this=>global!exports?global.Promise!core-js/es6/promise'
+      'window.jQuery': 'jquery'
     }),
 
     new Webpack.DefinePlugin({

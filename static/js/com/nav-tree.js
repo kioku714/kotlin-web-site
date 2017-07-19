@@ -1,6 +1,6 @@
-var $ = require('jquery');
-var render = require('util/render');
-var localStorage = require('util/localStorage');
+import $ from 'jquery';
+import render from 'util/render';
+import localStorage from 'util/localStorage';
 
 var templates = {},
   helpers = {};
@@ -268,4 +268,4 @@ NavTree.prototype.templates.leafItem = function (item) {
   return t;
 };
 
-module.exports = NavTree
+export default NavTree

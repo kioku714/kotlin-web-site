@@ -1,3 +1,4 @@
+import fetch from 'whatwg-fetch'
 const $ = require('jquery');
 const URLSearchParams = require('url-search-params');
 

@@ -1,17 +1,13 @@
-require('../com/search');
-require('whatwg-fetch');
-require('../com/cookie-banner');
-const CodeMirror = require('../com/codemirror/CodeMirror');
-const NavTree = require('../com/nav-tree');
-const ExecutableCode = require('../com/executable-code');
-const $ = require('jquery');
+import '../com/search';
+import '../com/cookie-banner';
+import CodeMirror from '../com/codemirror/CodeMirror';
+import NavTree from '../com/nav-tree';
+import $ from 'jquery';
 
 $(document).ready(function () {
-  new ExecutableCode('.sample');
-
   CodeMirror.colorize($('.code._highlighted'));
 
-  var html = document.getElementsByTagName('html')[0];
+  const html = document.getElementsByTagName('html')[0];
 
   html.className = html.className.replace('no-js', '');
 
@@ -30,15 +26,15 @@ $(document).ready(function () {
   }, false);
 
   $('h1,h2,h3').each(function (element) {
-    var id = this.getAttribute("id");
-    if (id == null) return;
-    var referenceElement = document.createElement("a");
+    const id = this.getAttribute("id");
+    if (id === null) return;
+    const referenceElement = document.createElement("a");
     referenceElement.className = "anchor";
     referenceElement.href = "#" + id;
     this.appendChild(referenceElement);
   });
 
-  var sideTreeElement = document.querySelector('.js-side-tree-nav');
+  const sideTreeElement = document.querySelector('.js-side-tree-nav');
   if (sideTreeElement) {
     new NavTree(sideTreeElement);
   }
